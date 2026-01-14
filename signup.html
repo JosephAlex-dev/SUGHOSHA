@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - ShuGhosha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* --- CORE PAGE SETUP --- */
+        :root {
+           --accent-cyan: #48b0d6;
+           --accent-purple: #8b5cf6;
+        }
+        body {
+            background-color: #000000;
+        }
+
+        /* =========================================
+           --- PHASE 1: The Initial Warp Effect ---
+        ========================================= */
+        
+        .galaxy-background {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at center, #0a0a15 0%, #000000 100%);
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .galaxy-background::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0.95) 95%);
+            z-index: 20; pointer-events: none;
+            transition: background 3s ease-out;
+        }
+        .galaxy-background.galaxy-calm::after {
+             background: radial-gradient(circle at 50% 50%, transparent 10%, rgba(0,0,0,0.9) 50%, rgba(0,0,0,1) 90%);
+        }
+
+        .warp-layer {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100vmax; height: 100vmax;
+            transform: translate(-50%, -50%) scale(0.1);
+            opacity: 0;
+            will-change: transform, opacity;
+            transition: opacity 2s ease-out;
+        }
+
+        .galaxy-calm .warp-layer {
+            opacity: 0 !important; 
+        }
+
+        .warp-stars {
+             background-image: 
+                radial-gradient(1px 1px at 10% 10%, white, transparent),
+                radial-gradient(2px 2px at 50% 40%, white, transparent),
+                radial-gradient(1px 1px at 70% 20%, white, transparent),
+                radial-gradient(1px 1px at 40% 90%, white, transparent);
+            background-size: 400px 400px;
+            mix-blend-mode: screen;
+        }
+        .warp-stars-1 { animation: warp-flow 3s linear infinite; }
+        .warp-stars-2 { animation: warp-flow 3s linear infinite; animation-delay: 1.5s; }
+
+        .warp-nebula-1 {
+            background-image: radial-gradient(circle closest-side, transparent 40%, rgba(72, 176, 214, 0.4) 50%, transparent 70%);
+            filter: blur(50px);
+            animation: warp-flow 6s ease-in-out infinite;
+        }
+        .warp-nebula-2 {
+            background-image: radial-gradient(circle closest-side, transparent 40%, rgba(139, 92, 246, 0.3) 50%, transparent 70%);
+            filter: blur(60px);
+            animation: warp-flow 7s ease-in-out infinite;
+            animation-delay: 3s;
+        }
+
+        @keyframes warp-flow {
+            0% { transform: translate(-50%, -50%) scale(0.1) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.4; }
+            100% { transform: translate(-50%, -50%) scale(3.5) rotate(15deg); opacity: 0; }
+        }
+
+        /* =========================================
+           --- PHASE 2: The New Calm Particle Flow ---
+        ========================================= */
+        
+        .particle-container {
+            position: absolute; inset: 0;
+            opacity: 0;
+            transition: opacity 3s ease-in 1s;
+            z-index: 5;
+        }
+        
+        .galaxy-calm .particle-container {
+            opacity: 1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            filter: blur(1px);
+            animation: float-up 20s linear infinite;
+        }
+
+        .p1 { width: 3px; height: 3px; background: var(--accent-cyan); left: 10%; bottom: -10%; animation-delay: 0s; animation-duration: 25s; }
+        .p2 { width: 2px; height: 2px; background: var(--accent-purple); left: 30%; bottom: -20%; animation-delay: 5s; animation-duration: 30s;}
+        .p3 { width: 4px; height: 4px; background: var(--accent-cyan); left: 50%; bottom: -15%; animation-delay: 2s; animation-duration: 22s;}
+        .p4 { width: 2px; height: 2px; background: white; left: 70%; bottom: -10%; animation-delay: 8s; animation-duration: 28s; opacity: 0.4; }
+        .p5 { width: 3px; height: 3px; background: var(--accent-purple); left: 90%; bottom: -25%; animation-delay: 1s; animation-duration: 24s;}
+
+        @keyframes float-up {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-120vh) translateX(20px); opacity: 0; }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8);
+        }
+        .custom-checkbox:checked {
+            background-color: #48b0d6;
+            border-color: #48b0d6;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex justify-center px-4 py-12 relative overflow-x-hidden md:items-center">
+
+    <div id="galaxy-bg" class="galaxy-background">
+        <div class="warp-layer warp-stars warp-stars-1"></div>
+        <div class="warp-layer warp-stars warp-stars-2"></div>
+        <div class="warp-layer warp-nebula-1"></div>
+        <div class="warp-layer warp-nebula-2"></div>
+
+        <div class="particle-container">
+            <div class="particle p1"></div>
+            <div class="particle p2"></div>
+            <div class="particle p3"></div>
+            <div class="particle p4"></div>
+            <div class="particle p5"></div>
+        </div>
+    </div>
+
+    <div id="signup-card" class="glass-card w-full max-w-md p-8 rounded-2xl shadow-2xl relative opacity-0 translate-y-8 transition-all duration-1000 ease-out z-30 my-auto">
+        
+        <div class="flex justify-center mb-6">
+            <a href="index.html" class="flex items-center gap-1">
+                <img src="log.png" onerror="this.style.display='none'" alt="ShuGhosha Logo" class="h-14 w-auto object-contain" />
+            </a>
+        </div>
+
+        <h2 class="text-2xl font-bold text-center mb-2">Create Account</h2>
+        <p class="text-gray-400 text-center mb-6 text-sm">Join us to start your journey</p>
+
+        <div class="space-y-3 mb-6">
+            <a href="https://accounts.google.com" target="_blank" class="w-full glass-card hover:bg-white/5 transition flex items-center justify-center gap-3 py-2.5 rounded-lg text-sm font-medium text-white">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="h-5 w-5" alt="Google">
+                Sign up with Google
+            </a>
+            </div>
+
+        <div class="relative flex py-2 items-center mb-6">
+            <div class="flex-grow border-t border-white/10"></div>
+            <span class="flex-shrink-0 mx-4 text-gray-500 text-xs uppercase">Or register with email</span>
+            <div class="flex-grow border-t border-white/10"></div>
+        </div>
+
+        <form id="signupForm" action="#" class="space-y-4">
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+                <input type="text" id="fullname" placeholder="Enter your name" required
+                       class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#48b0d6] focus:ring-1 focus:ring-[#48b0d6] transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required
+                       class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#48b0d6] focus:ring-1 focus:ring-[#48b0d6] transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <div class="relative">
+                    <input type="password" id="password" placeholder="Create a password" required
+                           class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#48b0d6] focus:ring-1 focus:ring-[#48b0d6] transition pr-10">
+                    
+                    <button type="button" onclick="togglePassword()" class="absolute right-3 top-3.5 text-gray-400 hover:text-white transition focus:outline-none">
+                        <svg id="eye-open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <svg id="eye-closed" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.574-2.59M5.375 5.375a10.05 10.05 0 013.98-1.34M19.78 6.78a10.05 10.05 0 011.762 2.22c1.274 4.057-2.516 7-2.516 7m-3.98 3.98a3 3 0 01-3.98-3.98m-6-6L3 3m18 18l-3-3" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    <input id="terms" type="checkbox" required class="custom-checkbox h-4 w-4 rounded border-gray-600 bg-white/10 text-[#48b0d6] focus:ring-[#48b0d6] focus:ring-offset-gray-900">
+                </div>
+                <div class="ml-2 text-sm">
+                    <label for="terms" class="text-gray-300">I agree to the <a href="#" class="text-[#48b0d6] hover:underline">Terms</a> and <a href="#" class="text-[#48b0d6] hover:underline">Privacy Policy</a></label>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-[#48b0d6] hover:bg-[#3a9cbd] text-white font-bold py-3 rounded-lg transition shadow-[0_0_20px_rgba(72,176,214,0.3)]">
+                Create Account
+            </button>
+        </form>
+
+        <p class="text-center text-gray-400 text-sm mt-8">
+            Already have an account? 
+            <a href="login.html" class="text-[#48b0d6] hover:text-cyan-300 font-medium transition">Log in</a>
+        </p>
+
+         <div class="absolute -bottom-12 w-full text-center">
+            <a href="index.html" class="text-gray-500 hover:text-white text-sm transition flex items-center justify-center gap-1">
+                &larr; Back to Home 
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Trigger Signup Card Entrance
+            setTimeout(() => {
+                const signupCard = document.getElementById('signup-card');
+                signupCard.classList.remove('opacity-0', 'translate-y-8');
+            }, 100);
+
+            // 2. Trigger "Calm State" transition after 5 seconds
+            setTimeout(() => {
+                const galaxyBg = document.getElementById('galaxy-bg');
+                galaxyBg.classList.add('galaxy-calm');
+            }, 5000); 
+        });
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeOpen = document.getElementById('eye-open');
+            const eyeClosed = document.getElementById('eye-closed');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeOpen.classList.add('hidden');
+                eyeClosed.classList.remove('hidden');
+            } else {
+                passwordInput.type = 'password';
+                eyeOpen.classList.remove('hidden');
+                eyeClosed.classList.add('hidden');
+            }
+        }
+
+        // === CONNECT TO BACKEND ===
+        const signupForm = document.getElementById('signupForm');
+
+        if(signupForm) {
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Stop page from reloading
+
+                // 1. Get values from inputs
+                const name = document.getElementById('fullname').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                // 2. Send data to your Node.js server
+                try {
+                    const res = await fetch('http://localhost:5000/api/auth/signup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name, email, password })
+                    });
+
+                    const data = await res.json();
+
+                    // 3. Handle Response
+                    if (res.ok) {
+                        alert('Signup Successful!');
+                        window.location.href = 'login.html'; // Redirect to login
+                    } else {
+                        alert(data.message); // Show error (e.g., "User already exists")
+                    }
+
+                } catch (err) {
+                    console.error('Error:', err);
+                    alert('Server error. Is your backend running?');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
