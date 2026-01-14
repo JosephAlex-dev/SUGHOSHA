@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in - SughOsha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* --- CORE PAGE SETUP --- */
+        :root {
+           --accent-cyan: #48b0d6;
+           --accent-purple: #8b5cf6;
+           --bg-dark: #050508;
+        }
+        body {
+            background-color: var(--bg-dark);
+            overflow: hidden; 
+            scrollbar-gutter: stable;
+        }
+        body.scroll-active { overflow-y: auto; overflow-x: hidden; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(72, 176, 214, 0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(72, 176, 214, 0.5); }
+
+
+        /* =========================================
+           --- NEW: The "Blast" Animation Elements ---
+        ========================================= */
+        
+        .aurora-background {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; background: var(--bg-dark);
+        }
+
+        /* --- Phase 1: The Traveling Balls --- */
+        .intro-ball {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 25px currentColor, 0 0 50px currentColor; 
+            opacity: 1;
+            z-index: 10;
+            will-change: transform, opacity;
+        }
+        .ball-cyan { background: white; color: var(--accent-cyan); }
+        .ball-purple { background: white; color: var(--accent-purple); }
+
+
+        @keyframes travel-blast-cyan {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            70% { transform: translate(-40vw, 35vh) scale(1); opacity: 1; }
+            100% { transform: translate(-45vw, 40vh) scale(50); opacity: 0; }
+        }
+        @keyframes travel-blast-purple {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            70% { transform: translate(35vw, -35vh) scale(1); opacity: 1; }
+            100% { transform: translate(45vw, -40vh) scale(50); opacity: 0; }
+        }
+
+        .ball-cyan.animate { animation: travel-blast-cyan 1.6s cubic-bezier(0.5, 0, 0.2, 1) forwards; }
+        .ball-purple.animate { animation: travel-blast-purple 1.6s cubic-bezier(0.5, 0, 0.2, 1) forwards; }
+
+
+        /* --- Phase 2: The Final Aurora Lights --- */
+        .aurora-light {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0;
+            mix-blend-mode: screen;
+            transition: opacity 0.8s ease-in;
+        }
+        .aurora-light.finished { opacity: 0.5; }
+
+        .light-1-final {
+            bottom: -10%; left: -20%;
+            width: 90vmax; height: 90vmax;
+            background: radial-gradient(circle, var(--accent-cyan), transparent 65%);
+        }
+        .light-2-final {
+            top: -10%; right: -20%;
+            width: 90vmax; height: 90vmax;
+            background: radial-gradient(circle, var(--accent-purple), transparent 65%);
+        }
+
+        /* =========================================
+           --- Card & UI Styles ---
+        ========================================= */
+        .main-container { min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 3rem 1rem; }
+        .glass-card-container { position: relative; }
+        .glass-card-container::before {
+            content: ''; position: absolute; inset: 0; border-radius: 1rem; 
+            background: linear-gradient(45deg, var(--accent-cyan), var(--accent-purple));
+            opacity: 0; filter: blur(25px); z-index: -1;
+            transition: opacity 1.5s ease-out 0.5s;
+        }
+        .card-loaded::before { opacity: 0.2; }
+
+        .glass-card {
+            background: rgba(20, 25, 40, 0.7);
+            backdrop-filter: blur(25px) saturate(150%);
+            -webkit-backdrop-filter: blur(25px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(40px) scale(0.96);
+            transition: all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .card-enter-active { opacity: 1 !important; transform: translateY(0) scale(1) !important; }
+
+        .glass-input {
+            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(0, 0, 0, 0.5); border-color: var(--accent-cyan); box-shadow: 0 0 0 2px rgba(72, 176, 214, 0.2);
+        }
+        .glass-input::placeholder { color: rgba(255, 255, 255, 0.4); }
+        .custom-checkbox:checked { background-color: var(--accent-cyan); border-color: var(--accent-cyan); }
+    </style>
+</head>
+<body class="text-white font-sans">
+
+    <div class="aurora-background">
+        <div id="ball-1" class="intro-ball ball-cyan"></div>
+        <div id="ball-2" class="intro-ball ball-purple"></div>
+
+        <div id="final-light-1" class="aurora-light light-1-final"></div>
+        <div id="final-light-2" class="aurora-light light-2-final"></div>
+    </div>
+
+    <main class="main-container">
+        <div id="card-container" class="glass-card-container w-full max-w-md relative z-30">
+            
+            <div id="login-card" class="glass-card p-8 rounded-2xl shadow-2xl">
+                
+                <div class="flex justify-center mb-4">
+                    <a href="Home.html" class="flex items-center gap-1">
+                        <img src="log.png" onerror="this.style.display='none'" alt="SughOsha Logo" class="h-14 w-auto object-contain" />
+                    </a>
+                </div>
+
+                <h2 class="text-2xl font-bold text-center mb-2 tracking-tight">Welcome Back</h2>
+                <p class="text-gray-400 text-center mb-8 text-sm">Sign in to enter the workspace</p>
+
+                <form id="loginForm" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1.5 ml-1">Email</label>
+                        <input type="email" id="email" placeholder="Enter your email" required
+                               class="glass-input w-full rounded-lg px-4 py-3 text-white focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1.5 ml-1">Password</label>
+                        <div class="relative">
+                            <input type="password" id="password" placeholder="Enter your password" required
+                                   class="glass-input w-full rounded-lg px-4 py-3 text-white focus:outline-none pr-10">
+                            <button type="button" onclick="togglePassword()" class="absolute right-3 top-3.5 text-gray-400 hover:text-white transition focus:outline-none">
+                                <svg id="eye-open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                <svg id="eye-closed" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.574-2.59M5.375 5.375a10.05 10.05 0 013.98-1.34M19.78 6.78a10.05 10.05 0 011.762 2.22c1.274 4.057-2.516 7-2.516 7m-3.98 3.98a3 3 0 01-3.98-3.98m-6-6L3 3m18 18l-3-3" /></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-sm mt-2">
+                        <div class="flex items-center">
+                            <input id="remember-me" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-600 bg-white/10 text-[#48b0d6] focus:ring-[#48b0d6] focus:ring-offset-gray-900 transition">
+                            <label for="remember-me" class="ml-2 block text-gray-300 cursor-pointer select-none">Remember me</label>
+                        </div>
+                        <a href="#" class="text-[#48b0d6] hover:text-cyan-300 font-medium transition">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-[#48b0d6] to-[#3a9cbd] hover:from-[#3a9cbd] hover:to-[#2c8aa8] text-white font-bold py-3.5 rounded-lg transition-all duration-300 shadow-[0_0_25px_rgba(72,176,214,0.3)] hover:shadow-[0_0_35px_rgba(72,176,214,0.5)] hover:scale-[1.02] active:scale-[0.98] mt-6">
+                        Log in
+                    </button>
+                </form>
+
+                <div class="relative flex py-2 items-center my-6">
+                    <div class="flex-grow border-t border-white/10"></div>
+                    <span class="flex-shrink-0 mx-4 text-gray-500 text-xs uppercase tracking-wider">Or continue with</span>
+                    <div class="flex-grow border-t border-white/10"></div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <button class="glass-input hover:bg-white/10 transition flex items-center justify-center py-2.5 rounded-lg"><img src="https://www.svgrepo.com/show/475656/google-color.svg" class="h-5 w-5" alt="Google"></button>
+                    <button class="glass-input hover:bg-white/10 transition flex items-center justify-center py-2.5 rounded-lg"><img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="h-5 w-5" alt="Facebook"></button>
+                    <button class="glass-input hover:bg-white/10 transition flex items-center justify-center py-2.5 rounded-lg"><svg class="h-5 w-5 fill-current" viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.74 1.18 0 2.21-1.23 3.91-1.2 2.34.02 3.77 1.25 4.38 2.19-4.27 2.1-3.38 8.8 1.63 11.24zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.84 1.53-2.95 1.51-.14-1.15.36-2.35 1.05-3.2z"/></svg></button>
+                </div>
+
+                <p class="text-center text-gray-400 text-sm mt-8">
+                    Don't have an account? 
+                    <a href="signup.html" class="text-[#48b0d6] hover:text-cyan-300 font-bold transition">Sign up</a>
+                </p>
+
+            </div>
+            
+            <div class="w-full text-center z-30 mt-8">
+                <a href="Home.html" class="text-gray-500 hover:text-white text-sm transition flex items-center justify-center gap-2 group">
+                    <span class="group-hover:-translate-x-1 transition-transform">&larr;</span> Back to Home
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Start the Ball Travel & Blast Animation
+            setTimeout(() => {
+                document.getElementById('ball-1').classList.add('animate');
+                document.getElementById('ball-2').classList.add('animate');
+            }, 200);
+
+            // 2. Fade in final lights and bring in the card during the "blast"
+            setTimeout(() => {
+                document.getElementById('final-light-1').classList.add('finished');
+                document.getElementById('final-light-2').classList.add('finished');
+                document.getElementById('login-card').classList.add('card-enter-active');
+                document.getElementById('card-container').classList.add('card-loaded');
+            }, 1300); // Timing matches the blast phase of the animation
+
+            // 3. Re-enable scrolling after all animations are complete (2 seconds)
+            setTimeout(() => {
+                document.body.classList.add('scroll-active');
+            }, 2000);
+        });
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeOpen = document.getElementById('eye-open');
+            const eyeClosed = document.getElementById('eye-closed');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text'; eyeOpen.classList.add('hidden'); eyeClosed.classList.remove('hidden');
+            } else {
+                passwordInput.type = 'password'; eyeOpen.classList.remove('hidden'); eyeClosed.classList.add('hidden');
+            }
+        }
+
+        // === CONNECT TO BACKEND ===
+        const loginForm = document.getElementById('loginForm');
+
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Stop page refresh
+
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const res = await fetch('http://localhost:5000/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        // Success: Save token and redirect
+                        localStorage.setItem('token', data.token); // Save the key
+                        alert('Login Successful! Welcome ' + data.user.name);
+                        window.location.href = 'Home.html'; // Go to homepage
+                    } else {
+                        // Error
+                        alert(data.message); // e.g., "Invalid credentials"
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    alert('Server error. Is the backend running?');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
